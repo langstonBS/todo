@@ -19,7 +19,7 @@ async function run() {
                 CREATE TABLE todo (
                     id SERIAL PRIMARY KEY NOT NULL,
                     task_name VARCHAR(512) NOT NULL,
-                    completed BOOL DEFAULT FALSE,
+                    completed BOOLEAN DEFAULT FALSE,
                     user_id INTEGER NOT NULL REFERENCES users(id)
             );
         `);

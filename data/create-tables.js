@@ -20,7 +20,7 @@ async function run() {
                     id SERIAL PRIMARY KEY NOT NULL,
                     task_name VARCHAR(512) NOT NULL,
                     completed BOOL DEFAULT FALSE,
-                    owner_id INTEGER NOT NULL REFERENCES users(id)
+                    user_id INTEGER NOT NULL REFERENCES users(id)
             );
         `);
 

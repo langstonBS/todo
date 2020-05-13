@@ -21,7 +21,6 @@ const authRoutes = createAuthRoutes({
     ).then(result => result.rows[0]);
   },
   insertUser(user, hash) {
-    console.log(user);
     return client.query(`
             INSERT into users (email, hash)
             VALUES ($1, $2)
@@ -46,30 +45,50 @@ app.get('/api/test', (req, res) => {
     message: `in this proctected route, we get the user's id like so: ${req.userId}`
   });
 });
-app.get('/api/todo', async (req, res) => {
-  const id = req.userId;
-  const data = await client.query('SELECT * from todo WHERE id = $1 ' [id]);
 
-  res.json(data.rows);
+
+app.get('/api/todo/', async(req, res) => {
+  try {
+    const data = await client.query(`
+    SELECT * 
+    FROM todo
+    WHERE todo.user_id=$1;`, [req.userId]);
+    res.json(data.rows);
+  } catch (e) {
+    res.json(e);
+  }
 });
 
+app.post('/api/todo', async(req, res) => {
+  try {
+    const data = await client.query(`
+  INSERT INTO todo(task_name , user_id, completed)
+  VALUES ($1, $2, $3)
+  RETURNING *`,  [req.body.task_name, req.userId, req.body.completed]);
+    res.json(data.rows);
+  } catch(e) {
+    res.json(e);
+  }
+});
 
-app.get('/api/users', async(req, res) => {
-  const data = await client.query('SELECT * from users');
+app.put('/api/todo/:id', async(req, res) => {
+  try {
 
-  res.json(data.rows);
+    
+    const data = await client.query(`
+    UPDATE todo
+    SET completed = true
+    WHERE id = $1 
+    AND user_id = $2
+    RETURNING *`,  [req.params.id, req.userId]);
+    res.json(data.rows);
+  } catch(e) {
+    res.json(e);
+  }
 });
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
   console.log(`Started on ${PORT}`);
 });
-
-app.post('/api/users', async(req, res) => {
-  const data = await client.query('SELECT * from users');
-
-  res.json(data.rows);
-});
-
-
 module.exports = app;
